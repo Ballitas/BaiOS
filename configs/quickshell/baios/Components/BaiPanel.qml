@@ -47,7 +47,7 @@ Rectangle {
             delegate: Item {
                 id: menuItem
 
-                required property string modelData
+                required property var modelData
                 required property int index
 
                 width: 300
@@ -56,7 +56,7 @@ Rectangle {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
 
-                    text: menuItem.modelData
+                    text: menuItem.modelData.name
                     color: "#FFFFFF"
                     opacity: mouseArea.containsMouse ? 1.0 : 0.62
 
@@ -93,12 +93,8 @@ Rectangle {
                     hoverEnabled: true
 
                     onClicked: {
-                        console.log(
-                            "Selected:",
-                            AppState.sectionName,
-                            menuItem.modelData
-                        );
-                    }
+    AppState.launch(menuItem.modelData);
+}
                 }
             }
         }
