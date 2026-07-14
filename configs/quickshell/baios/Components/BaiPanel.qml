@@ -45,58 +45,110 @@ Rectangle {
             model: AppState.sectionItems
 
             delegate: Item {
-                id: menuItem
+    id: menuItem
 
-                required property var modelData
-                required property int index
+    required property var modelData
+    required property int index
 
-                width: 300
-                height: 40
+    property bool selected: index === AppState.currentItem
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
+    width: 300
+    height: 40
 
-                    text: menuItem.modelData.name
-                    color: "#FFFFFF"
-                    opacity: mouseArea.containsMouse ? 1.0 : 0.62
+    Rectangle {
+        anchors.fill: parent
+        color: menuItem.selected ? "#222222" : "transparent"
 
-                    font {
-                        family: "Noto Sans"
-                        pixelSize: 18
-                        weight: mouseArea.containsMouse
-                            ? Font.Medium
-                            : Font.Normal
-                    }
+        Behavior on color {
+            ColorAnimation {
+                duration: 120
+            }
+        }
+    }
 
-                    transform: Translate {
-                        x: mouseArea.containsMouse ? 12 : 0
+    Rectangle {
+        width: menuItem.selected ? 10 : 0
+        height: 3
+        color: "#FFFFFF"
 
-                        Behavior on x {
-                            NumberAnimation {
-                                duration: 130
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-                    }
+        anchors {
+            left: parent.left
+            verticalCenter: parent.verticalCenter
+        }
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
+        Behavior on width {
+            NumberAnimation {
+                duration: 140
+                easing.type: Easing.OutCubic
+            }
+        }
+    }
+
+    Text {
+        anchors.verticalCenter: parent.verticalCenter
+
+        text: menuItem.modelData.name
+        color: "#FFFFFF"
+
+        opacity:
+            menuItem.selected || mouseArea.containsMouse
+                ? 1.0
+                : 0.45
+
+        font {
+            family: "Noto Sans"
+            pixelSize: menuItem.selected ? 19 : 18
+            weight:
+                menuItem.selected || mouseArea.containsMouse
+                    ? Font.DemiBold
+                    : Font.Normal
+        }
+
+        transform: Translate {
+            x:
+                menuItem.selected || mouseArea.containsMouse
+                    ? 20
+                    : 0
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: 140
+                    easing.type: Easing.OutCubic
                 }
+            }
+        }
 
-                MouseArea {
-                    id: mouseArea
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 120
+            }
+        }
 
-                    anchors.fill: parent
-                    hoverEnabled: true
+        Behavior on font.pixelSize {
+            NumberAnimation {
+                duration: 120
+            }
+        }
+    }
 
-                    onClicked: {
-    AppState.launch(menuItem.modelData);
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+        hoverEnabled: true
+
+        onEntered: {
+            AppState.currentItem = menuItem.index;
+        }
+
+        onClicked: {
+            AppState.currentItem = menuItem.index;
+            AppState.launch(menuItem.modelData);
+        }
+    }
 }
                 }
             }
         }
-    }
-}
+    
+

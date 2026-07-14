@@ -34,19 +34,39 @@ PanelWindow {
         focus: AppState.hubOpen
 
         Keys.onEscapePressed: event => {
-            AppState.closeHub();
-            event.accepted = true;
-        }
+    AppState.closeHub();
+    event.accepted = true;
+}
 
-        Keys.onUpPressed: event => {
-            AppState.previousSection();
-            event.accepted = true;
-        }
+Keys.onUpPressed: event => {
+    AppState.previousItem();
+    event.accepted = true;
+}
 
-        Keys.onDownPressed: event => {
-            AppState.nextSection();
-            event.accepted = true;
-        }
+Keys.onDownPressed: event => {
+    AppState.nextItem();
+    event.accepted = true;
+}
+
+Keys.onLeftPressed: event => {
+    AppState.previousSection();
+    event.accepted = true;
+}
+
+Keys.onRightPressed: event => {
+    AppState.nextSection();
+    event.accepted = true;
+}
+
+Keys.onReturnPressed: event => {
+    AppState.launchCurrent();
+    event.accepted = true;
+}
+
+Keys.onEnterPressed: event => {
+    AppState.launchCurrent();
+    event.accepted = true;
+}
 
         Connections {
             target: AppState

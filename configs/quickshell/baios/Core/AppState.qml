@@ -8,107 +8,72 @@ Singleton {
 
     property bool hubOpen: false
     property int currentSection: 0
+    property int currentItem: 0
     property real ringRotation: 0
 
     readonly property var sections: [
-    {
-        name: "APPS",
-        items: [
-            {
-                name: "Firefox",
-                command: ["firefox"]
-            },
-            {
-                name: "Files",
-                command: ["thunar"]
-            },
-            {
-                name: "Steam",
-                command: ["steam"]
-            },
-            {
-                name: "Terminal",
-                command: ["kitty"]
-            }
-        ]
-    },
-    {
-        name: "GAMES",
-        items: [
-            {
-                name: "Steam",
-                command: ["steam"]
-            },
-            {
-                name: "Heroic",
-                command: ["heroic"]
-            },
-            {
-                name: "Lutris",
-                command: ["lutris"]
-            }
-        ]
-    },
-    {
-        name: "DEVELOPMENT",
-        items: [
-            {
-                name: "Visual Studio Code",
-                command: ["code"]
-            },
-            {
-                name: "Terminal",
-                command: ["kitty"]
-            },
-            {
-                name: "GitHub",
-                command: ["firefox", "https://github.com"]
-            }
-        ]
-    },
-    {
-        name: "SYSTEM",
-        items: [
-            {
-                name: "Files",
-                command: ["thunar"]
-            },
-            {
-                name: "Network",
-                command: ["nm-connection-editor"]
-            },
-            {
-                name: "Audio",
-                command: ["pavucontrol"]
-            },
-            {
-                name: "Bluetooth",
-                command: ["blueman-manager"]
-            }
-        ]
-    },
-    {
-        name: "POWER",
-        items: [
-            {
-                name: "Lock",
-                command: ["hyprlock"]
-            },
-            {
-                name: "Suspend",
-                command: ["systemctl", "suspend"]
-            },
-            {
-                name: "Restart",
-                command: ["systemctl", "reboot"]
-            },
-            {
-                name: "Shut Down",
-                command: ["systemctl", "poweroff"]
-            }
-        ]
-    }
-]
+        {
+            name: "APPS",
+            items: [
+                { name: "Firefox", command: ["firefox"] },
+                { name: "Files", command: ["thunar"] },
+                { name: "Steam", command: ["steam"] },
+                { name: "Terminal", command: ["kitty"] }
+            ]
+        },
+        {
+            name: "GAMES",
+            items: [
+                { name: "Steam", command: ["steam"] },
+                { name: "Heroic", command: ["heroic"] },
+                { name: "Lutris", command: ["lutris"] }
+            ]
+        },
+        {
+            name: "DEVELOPMENT",
+            items: [
+                { name: "Visual Studio Code", command: ["code"] },
+                { name: "Terminal", command: ["kitty"] },
+                {
+                    name: "GitHub",
+                    command: ["firefox", "https://github.com"]
+                }
+            ]
+        },
+        {
+            name: "SYSTEM",
+            items: [
+                { name: "Files", command: ["thunar"] },
+                {
+                    name: "Network",
+                    command: ["nm-connection-editor"]
+                },
+                { name: "Audio", command: ["pavucontrol"] },
+                {
+                    name: "Bluetooth",
+                    command: ["blueman-manager"]
+                }
+            ]
+        },
+        {
+            name: "POWER",
+            items: [
+                { name: "Lock", command: ["hyprlock"] },
+                {
+                    name: "Suspend",
+                    command: ["systemctl", "suspend"]
+                },
+                {
+                    name: "Restart",
+                    command: ["systemctl", "reboot"]
+                },
+                {
+                    name: "Shut Down",
+                    command: ["systemctl", "poweroff"]
+                }
+            ]
+        }
+    ]
 
     readonly property var activeSection: sections[currentSection]
     readonly property string sectionName: activeSection.name
@@ -139,6 +104,7 @@ Singleton {
 
     function nextSection(): void {
         currentSection = (currentSection + 1) % sections.length;
+        currentItem = 0;
         ringRotation += 45;
     }
 
@@ -146,13 +112,38 @@ Singleton {
         currentSection =
             (currentSection - 1 + sections.length) % sections.length;
 
+        currentItem = 0;
         ringRotation -= 45;
     }
-    function launch(item): void {
-    if (!item || !item.command)
-        return;
 
-    Quickshell.execDetached(item.command);
-    closeHub();
-}
+    function nextItem(): void {
+        if (sectionItems.length === 0)
+            return;
+
+        currentItem = (currentItem + 1) % sectionItems.length;
+    }
+
+    function previousItem(): void {
+        if (sectionItems.length === 0)
+            return;
+
+        currentItem =
+            (currentItem - 1 + sectionItems.length)
+            % sectionItems.length;
+    }
+
+    function launchCurrent(): void {
+        if (sectionItems.length === 0)
+            return;
+
+        launch(sectionItems[currentItem]);
+    }
+
+    function launch(item): void {
+        if (!item || !item.command)
+            return;
+
+        Quickshell.execDetached(item.command);
+        closeHub();
+    }
 }
