@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 Singleton {
     id: state
@@ -11,7 +12,27 @@ Singleton {
     property int currentItem: 0
     property real ringRotation: 0
 
-    readonly property var sections: [
+    // Monochromatic Theme Variables
+    readonly property color colorBgStart: "#0a0a0a"
+    readonly property color colorBgEnd: "#020202"
+    readonly property color colorPanelStart: "#141414"
+    readonly property color colorPanelEnd: "#0a0a0a"
+    readonly property color colorPillBg: "#262626"
+    readonly property color colorPillBorder: "#3a3a3a"
+    readonly property color colorTextActive: "#ffffff"
+    readonly property color colorTextInactive: "#666666"
+    readonly property color colorAccent: "#ffffff"
+    readonly property string fontBase: "Noto Sans, Inter, Roboto, Helvetica, sans-serif"
+    readonly property string fontHeader: "Anton, Montserrat, Arial, sans-serif"
+    readonly property string fontMono: "JetBrains Mono, Fira Code, Courier New, monospace"
+
+    property var customApps: []
+
+    property var sections: [
+        {
+            name: "ALL",
+            items: state.customApps
+        },
         {
             name: "APPS",
             items: [
@@ -145,5 +166,24 @@ Singleton {
 
         Quickshell.execDetached(item.command);
         closeHub();
+    }
+
+    Process {
+        id: appLoader
+        command: ["python3", Quickshell.shellDir + "/Core/get_apps.py"]
+        running: true
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var apps = JSON.parse(this.text);
+                    if (apps && apps.length > 0) {
+                        state.customApps = apps;
+                    }
+                } catch(e) {
+                    console.log("Failed to load applications: " + e);
+                }
+            }
+        }
     }
 }

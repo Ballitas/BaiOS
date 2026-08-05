@@ -39,4 +39,15 @@ ShellRoot {
     }
 
     BaiHub {}
+    
+    Variants {
+    model: Quickshell.screens
+
+    delegate: Component {
+        BaiRail {
+            required property var modelData
+            screen: modelData
+        }
+    }
+}
 }
