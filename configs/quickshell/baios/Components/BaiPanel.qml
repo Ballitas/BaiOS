@@ -10,6 +10,14 @@ Rectangle {
 
     property alias listView: listView
 
+    function focusSearch(): void {
+        searchInput.forceActiveFocus();
+    }
+
+    function clearSearch(): void {
+        searchInput.text = "";
+    }
+
     // Translucent right border line
     Rectangle {
         width: 1
@@ -19,12 +27,175 @@ Rectangle {
         anchors.right: parent.right
     }
 
+    // Premium Search Container
+    Rectangle {
+        id: searchContainer
+        height: 40
+        anchors {
+            top: parent.top
+            topMargin: 24
+            left: parent.left
+            leftMargin: 24
+            right: parent.right
+            rightMargin: 24
+        }
+        
+        color: searchInput.activeFocus ? "#121212" : "#0a0a0a"
+        border.color: searchInput.activeFocus ? "#ffffff" : "#262626"
+        border.width: 1
+        radius: 8
+        
+        opacity: AppState.hubOpen ? 1.0 : 0.0
+        
+        Behavior on color { ColorAnimation { duration: 150 } }
+        Behavior on border.color { ColorAnimation { duration: 150 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 250
+                easing.type: Easing.OutQuad
+            }
+        }
+        
+        // Search Icon
+        Text {
+            id: searchIcon
+            anchors {
+                left: parent.left
+                leftMargin: 12
+                verticalCenter: parent.verticalCenter
+            }
+            text: "⌕"
+            color: searchInput.activeFocus ? AppState.colorTextActive : AppState.colorTextInactive
+            font {
+                family: AppState.fontMono
+                pixelSize: 20
+            }
+            Behavior on color { ColorAnimation { duration: 150 } }
+        }
+        
+        TextInput {
+            id: searchInput
+            anchors {
+                left: searchIcon.right
+                leftMargin: 8
+                right: clearButton.left
+                rightMargin: 8
+                verticalCenter: parent.verticalCenter
+            }
+            
+            color: AppState.colorTextActive
+            font {
+                family: AppState.fontBase
+                pixelSize: 14
+            }
+            selectByMouse: true
+            
+            Binding {
+                target: searchInput
+                property: "text"
+                value: AppState.searchQuery
+            }
+            
+            Text {
+                text: "Search apps..."
+                color: AppState.colorTextInactive
+                visible: parent.text === ""
+                font: parent.font
+                opacity: 0.5
+            }
+            
+            onTextChanged: {
+                AppState.searchQuery = text;
+                AppState.currentItem = 0;
+            }
+            
+            Keys.onUpPressed: event => {
+                AppState.previousItem();
+                event.accepted = true;
+            }
+            Keys.onDownPressed: event => {
+                AppState.nextItem();
+                event.accepted = true;
+            }
+            Keys.onLeftPressed: event => {
+                if (cursorPosition === 0) {
+                    AppState.previousSection();
+                    event.accepted = true;
+                } else {
+                    event.accepted = false;
+                }
+            }
+            Keys.onRightPressed: event => {
+                if (cursorPosition === text.length) {
+                    AppState.nextSection();
+                    event.accepted = true;
+                } else {
+                    event.accepted = false;
+                }
+            }
+            Keys.onReturnPressed: event => {
+                AppState.launchCurrent();
+                event.accepted = true;
+            }
+            Keys.onEnterPressed: event => {
+                AppState.launchCurrent();
+                event.accepted = true;
+            }
+            Keys.onEscapePressed: event => {
+                AppState.closeHub();
+                event.accepted = true;
+            }
+        }
+        
+        // Clear Button
+        Text {
+            id: clearButton
+            anchors {
+                right: parent.right
+                rightMargin: 12
+                verticalCenter: parent.verticalCenter
+            }
+            text: "×"
+            color: clearMouse.containsMouse ? AppState.colorTextActive : AppState.colorTextInactive
+            font {
+                family: AppState.fontBase
+                pixelSize: 18
+                bold: true
+            }
+            visible: searchInput.text !== ""
+            
+            Behavior on color { ColorAnimation { duration: 100 } }
+            
+            MouseArea {
+                id: clearMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    searchInput.text = "";
+                    searchInput.forceActiveFocus();
+                }
+            }
+        }
+    }
+
+    Text {
+        anchors.centerIn: listView
+        text: "No applications found"
+        color: AppState.colorTextInactive
+        visible: listView.count === 0 && AppState.searchQuery !== ""
+        font {
+            family: AppState.fontBase
+            pixelSize: 15
+        }
+        opacity: 0.6
+    }
+
     // ListView replacing the Repeater
     ListView {
         id: listView
         anchors {
             top: parent.top
-            topMargin: 80
+            topMargin: 88
             left: parent.left
             leftMargin: 0
             right: parent.right

@@ -136,9 +136,9 @@ PanelWindow {
                 rightMargin: 16
             }
 
-            height: 1
+            height: 2
             color: AppState.colorTextActive
-            opacity: 0.06
+            opacity: 0.2
         }
 
         /*

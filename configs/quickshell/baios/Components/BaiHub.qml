@@ -77,8 +77,11 @@ Keys.onEnterPressed: event => {
             target: AppState
 
             function onHubOpenChanged(): void {
-                if (AppState.hubOpen)
-                    background.forceActiveFocus();
+                if (AppState.hubOpen) {
+                    panel.focusSearch();
+                } else {
+                    panel.clearSearch();
+                }
             }
         }
 

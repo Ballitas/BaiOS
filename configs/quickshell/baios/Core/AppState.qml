@@ -96,9 +96,35 @@ Singleton {
         }
     ]
 
+    property string searchQuery: ""
+
     readonly property var activeSection: sections[currentSection]
     readonly property string sectionName: activeSection.name
-    readonly property var sectionItems: activeSection.items
+    readonly property var sectionItems: {
+        var items = activeSection.items;
+        if (searchQuery === "")
+            return items;
+
+        var query = searchQuery.toLowerCase();
+        var filtered = [];
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            if (item && item.name && item.name.toLowerCase().indexOf(query) !== -1) {
+                filtered.push(item);
+            }
+        }
+        return filtered;
+    }
+
+    onSectionItemsChanged: {
+        if (currentItem >= sectionItems.length) {
+            currentItem = 0;
+        }
+    }
+
+    onCurrentSectionChanged: {
+        searchQuery = "";
+    }
 
     function openHub(): void {
         if (hubOpen)
