@@ -1,0 +1,8 @@
+NAME="BaiOS"
+PRETTY_NAME="BaiOS Developer Preview"
+ID=baios
+ID_LIKE=arch
+BUILD_ID=0.1
+ANSI_COLOR="1;37"
+HOME_URL="https://github.com/Ballitas/BaiOS"
+DOCUMENTATION_URL="https://github.com/Ballitas/BaiOS"

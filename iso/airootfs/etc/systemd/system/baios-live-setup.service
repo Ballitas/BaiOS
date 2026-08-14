@@ -1,0 +1,11 @@
+[Unit]
+Description=BaiOS Live Environment Setup
+Before=getty@tty1.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/baios-live-setup
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

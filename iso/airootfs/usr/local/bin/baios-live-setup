@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if ! id bai >/dev/null 2>&1; then
+    useradd -m -G wheel,audio,video,input -s /bin/bash bai
+    passwd -d bai
+
+    cp -a /etc/skel/. /home/bai/
+    chown -R bai:bai /home/bai
+fi
+
+exit 0
