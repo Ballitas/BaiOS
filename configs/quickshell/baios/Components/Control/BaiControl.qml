@@ -10,15 +10,21 @@ PanelWindow {
 
     readonly property bool open: AppState.controlOpen
 
-    visible: open
+    // Keep window mapped during slide-up / fade-in animation
+    visible: open || (translation.y < 30)
 
     anchors {
-        top: true
         bottom: true
         left: true
     }
 
-    implicitWidth: 380
+    margins {
+        left: 80
+        bottom: 24
+    }
+
+    implicitWidth: 300
+    implicitHeight: 400
 
     color: "transparent"
 
@@ -26,41 +32,72 @@ PanelWindow {
 
     WlrLayershell.keyboardFocus:
         open
-            ? WlrKeyboardFocus.Exclusive
+            ? WlrKeyboardFocus.OnDemand
             : WlrKeyboardFocus.None
 
     Rectangle {
+        id: contentContainer
         anchors.fill: parent
+        
+        // Curated dark gradient background for premium feel
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#141414" }
+            GradientStop { position: 1.0; color: "#0a0a0a" }
+        }
+        
+        // Crisp thin white border
+        border.color: "#33ffffff"
+        border.width: 1
+        opacity: AppState.controlOpen ? 1.0 : 0.0
+        
+        radius: 16
+        clip: true
 
-        color: "#080808"
+        transform: Translate {
+            id: translation
+            y: AppState.controlOpen ? 0 : 30
+            Behavior on y {
+                NumberAnimation {
+                    duration: 250
+                    easing.type: Easing.OutCubic
+                }
+            }
+        }
 
-        Rectangle {
-            anchors.right: parent.right
-            width: 1
-            height: parent.height
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 220
+                easing.type: Easing.OutQuad
+            }
+        }
 
-            color: AppState.colorTextActive
-            opacity: 0.06
+        Connections {
+            target: AppState
+
+            function onControlOpenChanged(): void {
+                if (AppState.controlOpen) {
+                    contentContainer.forceActiveFocus();
+                }
+            }
         }
 
         Column {
             anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                margins: 40
+                fill: parent
+                margins: 18
             }
 
-            spacing: 28
+            spacing: 14
 
             Text {
                 text: "SYSTEM"
-
                 color: AppState.colorTextActive
 
                 font {
-                    family: AppState.fontDisplay
-                    pixelSize: 40
+                    family: AppState.fontHeader
+                    pixelSize: 18
+                    bold: true
+                    letterSpacing: 2
                 }
             }
 
@@ -68,41 +105,39 @@ PanelWindow {
                 width: parent.width
                 height: 1
                 color: AppState.colorTextActive
-                opacity: 0.08
+                opacity: 0.06
             }
 
             BaiSlider {
+                width: parent.width
                 label: "AUDIO"
-                value: 0.72
-
-                onValueChangedByUser:
-                    value => console.log("Audio:", value)
+                onValueChangedByUser: value => AppState.setVolume(value)
+                Binding on value { value: AppState.volume }
             }
 
             BaiSlider {
+                width: parent.width
                 label: "BRIGHTNESS"
-                value: 0.80
-
-                onValueChangedByUser:
-                    value => console.log("Brightness:", value)
+                onValueChangedByUser: value => AppState.setBrightness(value)
+                Binding on value { value: AppState.brightness }
             }
 
             Row {
-                spacing: 16
+                width: parent.width
+                spacing: 12
 
                 BaiToggle {
+                    width: (parent.width - 12) / 2
                     label: "WI-FI"
-                    checked: true
-
-                    onToggled:
-                        checked => console.log("WiFi:", checked)
+                    onToggled: checked => AppState.setWifi(checked)
+                    Binding on checked { value: AppState.wifiEnabled }
                 }
 
                 BaiToggle {
+                    width: (parent.width - 12) / 2
                     label: "BLUETOOTH"
-
-                    onToggled:
-                        checked => console.log("Bluetooth:", checked)
+                    onToggled: checked => AppState.setBluetooth(checked)
+                    Binding on checked { value: AppState.bluetoothEnabled }
                 }
             }
 
@@ -110,11 +145,11 @@ PanelWindow {
                 width: parent.width
                 height: 1
                 color: AppState.colorTextActive
-                opacity: 0.08
+                opacity: 0.06
             }
 
             Column {
-                spacing: 8
+                spacing: 6
 
                 Text {
                     text: "NETWORK"
@@ -123,19 +158,18 @@ PanelWindow {
 
                     font {
                         family: AppState.fontMono
-                        pixelSize: 10
-                        letterSpacing: 2
+                        pixelSize: 9
+                        letterSpacing: 1.5
                     }
                 }
 
                 Text {
-                    text: "Connected network"
-
+                    text: AppState.networkName
                     color: AppState.colorTextActive
 
                     font {
-                        family: AppState.fontUi
-                        pixelSize: 14
+                        family: AppState.fontBase
+                        pixelSize: 13
                     }
                 }
             }

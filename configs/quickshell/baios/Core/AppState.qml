@@ -25,6 +25,34 @@ Singleton {
     readonly property string fontBase: "Noto Sans, Inter, Roboto, Helvetica, sans-serif"
     readonly property string fontHeader: "Anton, Montserrat, Arial, sans-serif"
     readonly property string fontMono: "JetBrains Mono, Fira Code, Courier New, monospace"
+    readonly property string fontUi: fontBase
+    readonly property string fontDisplay: fontHeader
+
+    property real volume: 1.0
+    property real brightness: 1.0
+    property bool wifiEnabled: false
+    property bool bluetoothEnabled: false
+    property string networkName: "Disconnected"
+
+    function setVolume(val: real): void {
+        volume = Math.max(0.0, Math.min(1.0, val));
+        Quickshell.execDetached(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", volume.toFixed(2)]);
+    }
+
+    function setBrightness(val: real): void {
+        brightness = Math.max(0.0, Math.min(1.0, val));
+        Quickshell.execDetached(["sh", "-c", "echo " + brightness.toFixed(2) + " > /tmp/baios_brightness"]);
+    }
+
+    function setWifi(enabled: bool): void {
+        wifiEnabled = enabled;
+        Quickshell.execDetached(["nmcli", "radio", "wifi", enabled ? "on" : "off"]);
+    }
+
+    function setBluetooth(enabled: bool): void {
+        bluetoothEnabled = enabled;
+        Quickshell.execDetached(["sh", "-c", "rfkill " + (enabled ? "unblock" : "block") + " bluetooth; echo " + (enabled ? "on" : "off") + " > /tmp/baios_bluetooth_state"]);
+    }
 
     property var customApps: []
 
@@ -224,6 +252,40 @@ Singleton {
                     console.log("Failed to load applications: " + e);
                 }
             }
+        }
+    }
+
+    Process {
+        id: statusLoader
+        command: ["python3", Quickshell.shellDir + "/Core/get_status.py"]
+        running: true
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var data = JSON.parse(this.text);
+                    if (data) {
+                        state.volume = data.volume;
+                        state.brightness = data.brightness;
+                        state.wifiEnabled = data.wifi;
+                        state.bluetoothEnabled = data.bluetooth;
+                        state.networkName = data.network;
+                    }
+                } catch(e) {
+                    console.log("Failed to load status: " + e);
+                }
+            }
+        }
+    }
+
+    Timer {
+        id: statusTimer
+        interval: 3000
+        running: true
+        repeat: true
+        onTriggered: {
+            statusLoader.running = false;
+            statusLoader.running = true;
         }
     }
 }

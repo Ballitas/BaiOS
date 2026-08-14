@@ -278,8 +278,9 @@ PanelWindow {
                 height: 48
 
                 Rectangle {
-                    width: 28
-                    height: 28
+                    id: diamondIcon
+                    width: 20
+                    height: 20
                     anchors.centerIn: parent
 
                     color: AppState.controlOpen
@@ -289,16 +290,37 @@ PanelWindow {
                     border.color: AppState.colorTextActive
                     border.width: 1
 
-                    rotation: 45
+                    // 90-degree spin on toggle
+                    rotation: AppState.controlOpen ? 135 : 45
+                    
+                    // Tactile scale feedback
+                    scale: railToggleMouse.pressed 
+                        ? 0.8 
+                        : (railToggleMouse.containsMouse ? 1.15 : 1.0)
+
+                    Behavior on rotation {
+                        NumberAnimation {
+                            duration: 300
+                            easing.type: Easing.OutBack
+                        }
+                    }
+
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 150
+                            easing.type: Easing.OutCubic
+                        }
+                    }
 
                     Behavior on color {
                         ColorAnimation {
-                            duration: 140
+                            duration: 180
                         }
                     }
                 }
 
                 MouseArea {
+                    id: railToggleMouse
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: AppState.toggleControl()

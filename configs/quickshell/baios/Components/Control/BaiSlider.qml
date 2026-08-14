@@ -84,12 +84,35 @@ Item {
         }
 
         MouseArea {
-            anchors.fill: parent
+            anchors {
+                fill: parent
+                topMargin: -12
+                bottomMargin: -12
+            }
+            hoverEnabled: true
 
             onPressed: mouse => updateValue(mouse.x)
             onPositionChanged: mouse => {
                 if (pressed)
                     updateValue(mouse.x);
+            }
+
+            onWheel: wheel => {
+                var step = 0.05;
+                var delta = wheel.angleDelta.y;
+                var newValue = root.value;
+                if (delta > 0) {
+                    newValue = Math.min(1.0, root.value + step);
+                } else if (delta < 0) {
+                    newValue = Math.max(0.0, root.value - step);
+                }
+                
+                if (newValue !== root.value) {
+                    root.value = newValue;
+                    root.valueChangedByUser(newValue);
+                }
+                
+                wheel.accepted = true;
             }
 
             function updateValue(xPos) {
