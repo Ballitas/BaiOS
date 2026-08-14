@@ -126,12 +126,26 @@ Singleton {
         searchQuery = "";
     }
 
+    property bool controlOpen: false
+
+    function toggleControl(): void {
+        controlOpen = !controlOpen;
+
+        if (controlOpen)
+            closeHub();
+    }
+
+    function closeControl(): void {
+        controlOpen = false;
+    }
+
     function openHub(): void {
         if (hubOpen)
             return;
 
         hubOpen = true;
         ringRotation += 180;
+        closeControl();
     }
 
     function closeHub(): void {

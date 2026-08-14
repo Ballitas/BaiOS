@@ -4,6 +4,7 @@ import Quickshell.Io
 
 import qs.Core
 import qs.Components
+import qs.Components.Control
 
 ShellRoot {
     IpcHandler {
@@ -36,9 +37,14 @@ ShellRoot {
         function currentSection(): string {
             return AppState.sectionName;
         }
+
+        function toggleControl(): void {
+            AppState.toggleControl();
+        }
     }
 
     BaiHub {}
+    BaiControl {}
     
     Variants {
     model: Quickshell.screens

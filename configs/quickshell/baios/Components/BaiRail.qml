@@ -272,6 +272,39 @@ PanelWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
+            // Control Panel Toggle Button
+            Item {
+                width: parent.width
+                height: 48
+
+                Rectangle {
+                    width: 28
+                    height: 28
+                    anchors.centerIn: parent
+
+                    color: AppState.controlOpen
+                        ? AppState.colorTextActive
+                        : "transparent"
+
+                    border.color: AppState.colorTextActive
+                    border.width: 1
+
+                    rotation: 45
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 140
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: AppState.toggleControl()
+                }
+            }
+
             // Elegant, clean, static vertical clock
             Item {
                 width: parent.width
