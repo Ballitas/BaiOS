@@ -46,6 +46,7 @@ ShellRoot {
 
     BaiHub {}
     BaiControl {}
+    BaiWallpaper {}
     
     Variants {
         model: Quickshell.screens

@@ -272,6 +272,90 @@ PanelWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
+            // Wallpaper Selector Toggle Button
+            Item {
+                width: parent.width
+                height: 48
+
+                Rectangle {
+                    id: wallpaperIcon
+                    width: 22
+                    height: 16
+                    radius: 2
+                    anchors.centerIn: parent
+                    color: AppState.wallpaperOpen
+                        ? AppState.colorTextActive
+                        : "transparent"
+
+                    border.color: AppState.colorTextActive
+                    border.width: 1.5
+                    clip: true
+
+                    scale: wallpaperMouse.pressed 
+                        ? 0.8 
+                        : (wallpaperMouse.containsMouse ? 1.15 : 1.0)
+
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: 150
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 180
+                        }
+                    }
+
+                    Rectangle {
+                        width: 10
+                        height: 10
+                        color: AppState.wallpaperOpen ? "#000000" : AppState.colorTextActive
+                        rotation: 45
+                        x: 2
+                        y: 9
+
+                        Behavior on color {
+                            ColorAnimation { duration: 180 }
+                        }
+                    }
+
+                    Rectangle {
+                        width: 8
+                        height: 8
+                        color: AppState.wallpaperOpen ? "#000000" : AppState.colorTextActive
+                        rotation: 45
+                        x: 10
+                        y: 11
+
+                        Behavior on color {
+                            ColorAnimation { duration: 180 }
+                        }
+                    }
+
+                    Rectangle {
+                        width: 4
+                        height: 4
+                        radius: 2
+                        color: AppState.wallpaperOpen ? "#000000" : AppState.colorTextActive
+                        x: 14
+                        y: 3
+
+                        Behavior on color {
+                            ColorAnimation { duration: 180 }
+                        }
+                    }
+                }
+
+                MouseArea {
+                    id: wallpaperMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: AppState.toggleWallpaper()
+                }
+            }
+
             // Control Panel Toggle Button
             Item {
                 width: parent.width

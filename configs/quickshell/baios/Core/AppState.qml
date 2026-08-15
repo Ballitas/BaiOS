@@ -155,12 +155,20 @@ Singleton {
     }
 
     property bool controlOpen: false
+    property bool wallpaperOpen: false
+    
+    readonly property alias wallpapersModel: wallpapersListModel
+    ListModel {
+        id: wallpapersListModel
+    }
 
     function toggleControl(): void {
         controlOpen = !controlOpen;
 
-        if (controlOpen)
+        if (controlOpen) {
             closeHub();
+            closeWallpaper();
+        }
     }
 
     function closeControl(): void {
@@ -174,6 +182,7 @@ Singleton {
         hubOpen = true;
         ringRotation += 180;
         closeControl();
+        closeWallpaper();
     }
 
     function closeHub(): void {
@@ -189,6 +198,32 @@ Singleton {
             closeHub();
         else
             openHub();
+    }
+
+    function toggleWallpaper(): void {
+        wallpaperOpen = !wallpaperOpen;
+        if (wallpaperOpen) {
+            closeHub();
+            closeControl();
+            loadWallpapers();
+        }
+    }
+
+    function closeWallpaper(): void {
+        wallpaperOpen = false;
+    }
+
+    function loadWallpapers(): void {
+        wallpaperLoader.running = false;
+        wallpaperLoader.running = true;
+    }
+
+    function setWallpaper(path: string): void {
+        Quickshell.execDetached(["waypaper", "--wallpaper", path]);
+        for (var i = 0; i < wallpapersListModel.count; i++) {
+            var item = wallpapersListModel.get(i);
+            wallpapersListModel.setProperty(i, "active", (item.path === path));
+        }
     }
 
     function nextSection(): void {
@@ -250,6 +285,28 @@ Singleton {
                     }
                 } catch(e) {
                     console.log("Failed to load applications: " + e);
+                }
+            }
+        }
+    }
+
+    Process {
+        id: wallpaperLoader
+        command: ["python3", Quickshell.shellDir + "/Core/get_wallpapers.py"]
+        running: true
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var data = JSON.parse(this.text);
+                    if (data && data.length > 0) {
+                        wallpapersListModel.clear();
+                        for (var i = 0; i < data.length; i++) {
+                            wallpapersListModel.append(data[i]);
+                        }
+                    }
+                } catch(e) {
+                    console.log("Failed to load wallpapers: " + e);
                 }
             }
         }
