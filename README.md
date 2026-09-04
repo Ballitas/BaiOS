@@ -22,7 +22,15 @@ BaiOS 0.1 is the first developer preview of the project. It provides a complete 
 
 ## Screenshots
 
-*Screenshots and promotional material will be added as the interface evolves.*
+![BaiOS Desktop Preview 1](screenshots/baios-2026-09-04_08-56-49.png)
+
+![BaiOS Desktop Preview 2](screenshots/baios-2026-09-04_08-57-11.png)
+
+![BaiOS Desktop Preview 3](screenshots/baios-2026-09-04_08-57-26.png)
+
+![BaiOS Desktop Preview 4](screenshots/baios-2026-09-04_08-58-16.png)
+
+![BaiOS Desktop Preview 5](screenshots/baios-2026-09-04_08-58-25.png)
 
 ---
 
